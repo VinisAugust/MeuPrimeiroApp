@@ -1,18 +1,46 @@
 import { Text, View, StyleSheet, Image, Pressable } from 'react-native';
+import {useEffect, useState} from "react";
 
 export default function Index() {
+  const valorInicial = 25*60;
+  const [timeLeft, setTimeLeft ] = useState(valorInicial);
+  const [inRunning, setIsRunisg] = useState(false);
+  const [timeLabel, setTimeLabel] = useState("Start");
+
+  function atualiza(){
+    setTimeLeft(valor => valor -1);
+  }
+
+  useEffect(() => {
+    let interval = null;
+    if (inRunning && timeLeft > 0) {
+      interval = setInterval(atualiza, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [inRunning, timeLeft]);
+  
+
+  function startTime(){
+    if(!inRunning){
+      setIsRunisg(true);
+      setTimeLabel("Stop")
+    }else{
+      setIsRunisg(false);
+      setTimeLabel("Start")
+    }
+  }
+
   return (
     <View style={style.container}>
       <Image source={require('../relogio.png')} style={style.image} />
       <View style={style.actions}>
-        <Text style={style.timer}>20:00</Text>
-
-        <Pressable style={style.buttonStart}>
-          <Text style={style.textButton}>Começar</Text>
+        <Text style={style.timer}>{timeLeft}</Text>
+        <Pressable style={!inRunning?style.buttonStart:style.buttonStop}onPress={startTime}>
+          <Text style={style.textButton}>{timeLabel}</Text>
         </Pressable>
       </View>
-
-      {/* Rodapé */}
       <View style={style.footer}>
         <Text style={style.textFooter}>Curso de React Native EAD</Text>
         <Text style={style.textFooter}>2025 - Meu App</Text>
@@ -53,6 +81,14 @@ const style = StyleSheet.create({
   buttonStart: {
     padding: 24,
     backgroundColor: '#021123',
+    width: '80%',
+    borderRadius: 32,
+    borderWidth: 2,
+    borderColor: '#144480',
+  },
+  buttonStop: {
+    padding: 24,
+    backgroundColor: '#FF0000', 
     width: '80%',
     borderRadius: 32,
     borderWidth: 2,
